@@ -89,14 +89,14 @@ func setDefaultValue(config *PzlogConfig) {
 
 }
 
-func GinLogger() gin.HandlerFunc {
+func GinLogger(logger *zap.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 		path := c.Request.URL.Path
 		query := c.Request.URL.RawQuery
 		c.Next()
 		cost := time.Since(start)
-		zap.L().Info(path,
+		logger.Info(path,
 			zap.Int("status", c.Writer.Status()),
 			zap.String("method", c.Request.Method),
 			zap.String("path", path),
