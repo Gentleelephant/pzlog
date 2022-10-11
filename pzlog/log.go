@@ -112,7 +112,7 @@ func GetLogger(config *PzlogConfig) *zap.Logger {
 	Encoder := getEncoder(config.Encoder)
 	WriteSyncer := GetWriteSyncer(config)
 	LevelEnabler := getLevelEnabler(config)
-	ConsoleEncoder := getConsoleEncoder()
+	ConsoleEncoder := getConsoleEncoder(config.Encoder)
 	var newCore zapcore.Core
 	if config.PrintConsole {
 		newCore = zapcore.NewTee(
@@ -164,8 +164,11 @@ func getEncoder(types string) zapcore.Encoder {
 }
 
 // GetConsoleEncoder 输出日志到控制台
-func getConsoleEncoder() zapcore.Encoder {
-	return zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+func getConsoleEncoder(types string) zapcore.Encoder {
+	if types == "console" {
+		return zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+	}
+	return zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
 }
 
 // GetWriteSyncer 自定义的WriteSyncer
