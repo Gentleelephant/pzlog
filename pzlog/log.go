@@ -46,6 +46,10 @@ type PzlogConfig struct {
 	MaxBackups int `json:"max_backups" yaml:"maxbackups"`
 
 	MaxAge int `json:"max_age" yaml:"maxage"`
+
+	LocalTime bool `json:"localtime" yaml:"localtime"`
+
+	Compress bool `json:"compress" yaml:"compress"`
 }
 
 func NewDefaultConfig() *PzlogConfig {
@@ -82,6 +86,7 @@ func setDefaultValue(config *PzlogConfig) {
 	if config.LogLevel == "" || !ok {
 		config.LogLevel = "info"
 	}
+
 }
 
 func GinLogger() gin.HandlerFunc {
@@ -110,7 +115,7 @@ func GetLogger(config *PzlogConfig) *zap.Logger {
 	}
 	setDefaultValue(config)
 	Encoder := getEncoder(config.Encoder)
-	WriteSyncer := GetWriteSyncer(config)
+	WriteSyncer := getWriteSyncer(config)
 	LevelEnabler := getLevelEnabler(config)
 	//ConsoleEncoder := getConsoleEncoder(config.Encoder)
 	var newCore zapcore.Core
@@ -163,7 +168,7 @@ func getEncoder(types string) zapcore.Encoder {
 
 }
 
-// GetConsoleEncoder 输出日志到控制台
+// getConsoleEncoder 输出日志到控制台
 func getConsoleEncoder(types string) zapcore.Encoder {
 	if types == "console" {
 		return zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
@@ -171,8 +176,8 @@ func getConsoleEncoder(types string) zapcore.Encoder {
 	return zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
 }
 
-// GetWriteSyncer 自定义的WriteSyncer
-func GetWriteSyncer(config *PzlogConfig) zapcore.WriteSyncer {
+// getWriteSyncer 自定义的WriteSyncer
+func getWriteSyncer(config *PzlogConfig) zapcore.WriteSyncer {
 	lumberJackLogger := &lumberjack.Logger{
 		Filename:   config.Filename,
 		MaxSize:    config.MaxSize,
