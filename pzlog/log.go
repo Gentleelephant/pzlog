@@ -101,10 +101,10 @@ func GetLogger(config *PzlogConfig) *zap.Logger {
 		config = NewDefaultConfig()
 	}
 	setDefaultValue(config)
-	Encoder := GetEncoder()
+	Encoder := getEncoder()
 	WriteSyncer := GetWriteSyncer(config)
-	LevelEnabler := GetLevelEnabler(config)
-	ConsoleEncoder := GetConsoleEncoder()
+	LevelEnabler := getLevelEnabler(config)
+	ConsoleEncoder := getConsoleEncoder()
 	var newCore zapcore.Core
 	if config.PrintConsole {
 		newCore = zapcore.NewTee(
@@ -118,7 +118,7 @@ func GetLogger(config *PzlogConfig) *zap.Logger {
 }
 
 // GetEncoder 自定义的Encoder
-func GetEncoder() zapcore.Encoder {
+func getEncoder() zapcore.Encoder {
 	return zapcore.NewConsoleEncoder(
 		zapcore.EncoderConfig{
 			TimeKey:        "ts",
@@ -137,7 +137,7 @@ func GetEncoder() zapcore.Encoder {
 }
 
 // GetConsoleEncoder 输出日志到控制台
-func GetConsoleEncoder() zapcore.Encoder {
+func getConsoleEncoder() zapcore.Encoder {
 	return zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
 }
 
@@ -153,7 +153,7 @@ func GetWriteSyncer(config *PzlogConfig) zapcore.WriteSyncer {
 }
 
 // GetLevelEnabler 自定义的LevelEnabler
-func GetLevelEnabler(config *PzlogConfig) zapcore.Level {
+func getLevelEnabler(config *PzlogConfig) zapcore.Level {
 	level := strings.ToLower(config.LogLevel)
 	switch level {
 	case "debug":
