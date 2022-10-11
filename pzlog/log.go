@@ -70,7 +70,8 @@ func setDefaultValue(config *PzlogConfig) {
 	if config.MaxAge < 0 {
 		config.MaxAge = 30
 	}
-	if config.LogLevel == "" {
+	_, ok := m[strings.ToLower(config.LogLevel)]
+	if config.LogLevel == "" || !ok {
 		config.LogLevel = "info"
 	}
 }
