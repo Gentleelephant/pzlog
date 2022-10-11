@@ -37,10 +37,15 @@ type PzlogConfig struct {
 
 	PrintConsole bool `json:"printconsole" yaml:"printconsole"`
 
+	// 日志格式，json或者console
+	Encoder string `json:"encoder" yaml:"encoder"`
+
 	// 日志文件最大大小
-	MaxSize    int `json:"max_size" yaml:"maxsize"`
+	MaxSize int `json:"max_size" yaml:"maxsize"`
+
 	MaxBackups int `json:"max_backups" yaml:"maxbackups"`
-	MaxAge     int `json:"max_age" yaml:"maxage"`
+
+	MaxAge int `json:"max_age" yaml:"maxage"`
 }
 
 func NewDefaultConfig() *PzlogConfig {
@@ -69,6 +74,9 @@ func setDefaultValue(config *PzlogConfig) {
 	}
 	if config.MaxAge < 0 {
 		config.MaxAge = 30
+	}
+	if config.Encoder == "" {
+		config.Encoder = "json"
 	}
 	_, ok := m[strings.ToLower(config.LogLevel)]
 	if config.LogLevel == "" || !ok {
@@ -101,7 +109,7 @@ func GetLogger(config *PzlogConfig) *zap.Logger {
 		config = NewDefaultConfig()
 	}
 	setDefaultValue(config)
-	Encoder := getEncoder()
+	Encoder := getEncoder(config.Encoder)
 	WriteSyncer := GetWriteSyncer(config)
 	LevelEnabler := getLevelEnabler(config)
 	ConsoleEncoder := getConsoleEncoder()
@@ -118,22 +126,41 @@ func GetLogger(config *PzlogConfig) *zap.Logger {
 }
 
 // GetEncoder 自定义的Encoder
-func getEncoder() zapcore.Encoder {
-	return zapcore.NewConsoleEncoder(
-		zapcore.EncoderConfig{
-			TimeKey:        "ts",
-			LevelKey:       "level",
-			NameKey:        "logger",
-			CallerKey:      "caller_line",
-			FunctionKey:    zapcore.OmitKey,
-			MessageKey:     "msg",
-			StacktraceKey:  "stacktrace",
-			LineEnding:     "  ",
-			EncodeLevel:    cEncodeLevel,
-			EncodeTime:     cEncodeTime,
-			EncodeDuration: zapcore.SecondsDurationEncoder,
-			EncodeCaller:   cEncodeCaller,
-		})
+func getEncoder(types string) zapcore.Encoder {
+	if types == "console" {
+		return zapcore.NewConsoleEncoder(
+			zapcore.EncoderConfig{
+				TimeKey:        "ts",
+				LevelKey:       "level",
+				NameKey:        "logger",
+				CallerKey:      "caller_line",
+				FunctionKey:    zapcore.OmitKey,
+				MessageKey:     "msg",
+				StacktraceKey:  "stacktrace",
+				LineEnding:     zapcore.DefaultLineEnding,
+				EncodeLevel:    cEncodeLevel,
+				EncodeTime:     cEncodeTime,
+				EncodeDuration: zapcore.SecondsDurationEncoder,
+				EncodeCaller:   cEncodeCaller,
+			})
+	} else {
+		return zapcore.NewJSONEncoder(
+			zapcore.EncoderConfig{
+				TimeKey:        "ts",
+				LevelKey:       "level",
+				NameKey:        "logger",
+				CallerKey:      "caller_line",
+				FunctionKey:    zapcore.OmitKey,
+				MessageKey:     "msg",
+				StacktraceKey:  "stacktrace",
+				LineEnding:     zapcore.DefaultLineEnding,
+				EncodeLevel:    cEncodeLevel,
+				EncodeTime:     cEncodeTime,
+				EncodeDuration: zapcore.SecondsDurationEncoder,
+				EncodeCaller:   cEncodeCaller,
+			})
+	}
+
 }
 
 // GetConsoleEncoder 输出日志到控制台
