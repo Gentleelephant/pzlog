@@ -204,15 +204,15 @@ func getLevelEnabler(config *PzlogConfig) zapcore.Level {
 
 // cEncodeLevel 自定义日志级别显示
 func cEncodeLevel(level zapcore.Level, enc zapcore.PrimitiveArrayEncoder) {
-	enc.AppendString("[" + level.CapitalString() + "]")
+	enc.AppendString(level.CapitalString())
 }
 
 // cEncodeTime 自定义时间格式显示
 func cEncodeTime(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-	enc.AppendString("[" + t.Format(logTmFmt) + "]")
+	enc.AppendString(t.Format(logTmFmt))
 }
 
 // cEncodeCaller 自定义行号显示
 func cEncodeCaller(caller zapcore.EntryCaller, enc zapcore.PrimitiveArrayEncoder) {
-	enc.AppendString("[" + caller.TrimmedPath() + "]")
+	enc.AppendString(caller.TrimmedPath())
 }
