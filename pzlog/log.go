@@ -28,8 +28,7 @@ var (
 )
 
 type PzlogConfig struct {
-	// 日志文件路径
-	Filename string `json:"filename" yaml:"filename"`
+	lumberjack.Logger
 
 	TimeFormat string `json:"timeformat" yaml:"timeformat"`
 
@@ -39,26 +38,20 @@ type PzlogConfig struct {
 
 	// 日志格式，json或者console
 	Encoder string `json:"encoder" yaml:"encoder"`
-
-	// 日志文件最大大小
-	MaxSize int `json:"max_size" yaml:"maxsize"`
-
-	MaxBackups int `json:"max_backups" yaml:"maxbackups"`
-
-	MaxAge int `json:"max_age" yaml:"maxage"`
-
-	LocalTime bool `json:"localtime" yaml:"localtime"`
-
-	Compress bool `json:"compress" yaml:"compress"`
 }
 
 func NewDefaultConfig() *PzlogConfig {
 	return &PzlogConfig{
-		Filename:   "./logs/pzlog.log",
-		TimeFormat: logTmFmt,
-		MaxSize:    100,
-		MaxBackups: 10,
-		MaxAge:     30,
+		Logger: lumberjack.Logger{
+			Filename:   "./logs/pzlog.log",
+			MaxSize:    100,
+			MaxBackups: 10,
+			MaxAge:     30,
+		},
+		TimeFormat:   "",
+		LogLevel:     "",
+		PrintConsole: false,
+		Encoder:      "",
 	}
 }
 
